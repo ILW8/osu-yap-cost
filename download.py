@@ -16,7 +16,9 @@ def get_manifest_from_url(url: str) -> str | None:
     :param url: Twitch VOD URL (e.g. "https://www.twitch.tv/videos/2315679372")
     :return: .m3u8 manifest URL, or None if failed
     """
-    ydl_opts = {}
+    ydl_opts = {
+        'format': 'bestaudio'
+    }
     with YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
 
