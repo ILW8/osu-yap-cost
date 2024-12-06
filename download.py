@@ -3,7 +3,9 @@ import math
 import requests
 import os
 import concurrent.futures
-from urllib.parse import urlparse, urlunparse, urljoin
+from urllib.parse import urlparse, urlunparse
+import ffmpeg
+import tempfile
 
 from yt_dlp import YoutubeDL
 
@@ -73,8 +75,6 @@ def download_from_playlist(uri: str, download_path_prefix="downloads", max_concu
     pad_amount = int(math.log10(len(fragments))) + 1
     count_completed = 0
 
-    fragment_paths: [str] = []
-
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_concurrent) as executor:
         futures_to_path = {
             executor.submit(
@@ -92,7 +92,25 @@ def download_from_playlist(uri: str, download_path_prefix="downloads", max_concu
                       f"{futures_to_path[future][1]}: {future.exception()}")
                 continue
             print(f"[{count_completed:>{pad_amount}}/{len(fragments)}] {futures_to_path[future][1]} completed")
-            fragment_paths.append(futures_to_path[future][0])
 
     print("Downloading fragments complete.")
-    return fragment_paths
+
+    # sort fragment paths given the manifest
+
+    return intermediate_path, fragments
+
+
+def merge_parts(parts: [str], output: str, overwrite_output: bool = False) -> None:
+    if not overwrite_output and os.path.exists(output) and os.path.isfile(output):
+        print(f"File {output} already exists, skipping merge.")
+        return
+
+    with tempfile.NamedTemporaryFile(delete=False, mode='w', suffix='.txt') as f:
+        for part in parts:
+            f.write(f"file '{os.path.abspath(part)}'\n")
+
+        ffmpeg.input(f.name, format='concat', safe=0).output(output, c='copy').overwrite_output().run()
+
+    # delete all parts from disk
+    for part in parts:
+        os.remove(part)
