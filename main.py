@@ -19,15 +19,16 @@ def main():
     prefix, fragments = download_from_playlist(manifest_url)
     print(fragments)
 
-    final_path = os.path.join(prefix, "final_merged.wav")
-    merge_parts([os.path.join(prefix, fragment) for fragment in fragments], final_path, overwrite_output=False)
-    assert os.path.exists(final_path)
+    merged_audio_path = os.path.join(prefix, "final_merged.wav")
+    merged_audio_resampled_path = os.path.join(prefix, "final_resampled.wav")
+    merge_parts([os.path.join(prefix, fragment) for fragment in fragments], merged_audio_path, overwrite_output=False)
+    assert os.path.exists(merged_audio_path)
 
-    diarization_data_path = diarize(final_path, DATA_LABEL)
+    diarization_data_path = diarize(merged_audio_path, DATA_LABEL)
 
     # todo: run whisper.cpp from here
     # for now, hardcode a path to transcript
-    resampled_audio_path = resample_audio(final_path, 16_000)
+    resampled_audio_path = resample_audio(merged_audio_path, merged_audio_resampled_path, 16_000)
     transcript_path = os.path.join("data", "showmatch_gf_yap_transcript.json")
 
     the_yap(transcript_path, diarization_data_path)
