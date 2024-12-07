@@ -1,3 +1,4 @@
+from diarization import diarize
 from download import download_from_playlist, get_manifest_from_url, merge_parts
 import os
 import shutil
@@ -15,6 +16,8 @@ def main():
     merge_parts([os.path.join(prefix, fragment) for fragment in fragments], final_path, overwrite_output=False)
 
     assert os.path.exists(final_path)
+
+    diarize(final_path)
 
 
 if __name__ == '__main__':
