@@ -1,11 +1,20 @@
+import os
+
 from pyannote.audio import Pipeline
 import torch
 
+from dotenv import load_dotenv
+
 
 def diarize(filename: str):
-    pipeline = Pipeline.from_pretrained(
-        "pyannote/speaker-diarization-3.1",
-        use_auth_token="HUGGINGFACE_ACCESS_TOKEN_GOES_HERE")
+    load_dotenv()
+    hf_token = os.environ.get("HUGGINGFACE_TOKEN")
+
+    if hf_token is None:
+        print("Hugging Face token not found in environment (HUGGINGFACE_TOKEN)")
+        return
+
+    pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization-3.1", use_auth_token=hf_token)
 
     # send pipeline to GPU (when available)
     pipeline.to(torch.device("cuda"))
