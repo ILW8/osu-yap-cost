@@ -28,4 +28,7 @@ if __name__ == '__main__':
     # Rotate and align the tick labels so they look better
     plt.gcf().autofmt_xdate()
 
+    # add legend
+    plt.legend(["ChillierPear", "Azer", "D I O"])
+
     plt.show()

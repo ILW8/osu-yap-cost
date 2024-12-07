@@ -43,6 +43,9 @@ def the_yap():
         "speaker_SPEAKER_02": "ChillierPear",
         "speaker_SPEAKER_03": "D I O",
         "speaker_SPEAKER_01": "Azer"
+        # "speaker_SPEAKER_04": "Doomsdau",
+        # "speaker_SPEAKER_03": "Damarsh",
+        # "speaker_SPEAKER_01": "SadShiba"
     }
 
     time_points = []
@@ -83,14 +86,16 @@ def the_yap():
     avg_words = sum(caster_yappage.values()) / len(caster_yappage)
     stdev_words = stdev(caster_yappage.values())
     for caster, words in caster_yappage.items():
-        # print(f"{caster}: {:.2f} z_yap")
+        if words == 0:
+            continue
+        # table_data.append([caster, words, round((words - avg_words) / stdev_words, 2)])
         table_data.append([caster, words, round((words - avg_words) / stdev_words, 2)])
 
     table_data.sort(key=lambda x: x[2], reverse=True)
 
     print(tabulate((list(zip(*list(zip(*table_data))[:2]))),
                    ["caster", "words spoken", "z_yap"],
-                   tablefmt="rounded_outline"))
+                   tablefmt="simple_outline"))
     return time_points, data_points
 
 
