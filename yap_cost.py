@@ -4,12 +4,12 @@ from collections import defaultdict
 from tabulate import tabulate
 
 
-if __name__ == '__main__':
-    with open("data/2315679372_yap_transcript.json", "r") as infile:
+def the_yap():
+    with open("data/2320297522_yap_transcript.json", "r") as infile:
         transcription_output = json.load(infile)
     transcript = transcription_output["transcription"]
 
-    with open("data/2315679372_diarization_output.txt", "r") as infile:
+    with open("data/2320297522_diarization_output.txt", "r") as infile:
         diarization_output = infile.readlines()
     diarization_output = [line.strip().split() for line in diarization_output]
     speakers = [(float(start.split("=")[-1][:-1]), float(end.split("=")[-1][:-1]), speaker)
@@ -40,10 +40,18 @@ if __name__ == '__main__':
     caster_yappage = defaultdict(int)
 
     speakers_map = {
-        "speaker_SPEAKER_01": "Doomsday",
-        "speaker_SPEAKER_03": "Damarsh",
-        "speaker_SPEAKER_04": "SadShiba"
+        "speaker_SPEAKER_02": "ChillierPear",
+        "speaker_SPEAKER_03": "D I O",
+        "speaker_SPEAKER_01": "Azer"
     }
+
+    time_points = []
+    data_points = defaultdict(list)
+    all_speakers_set = set()
+    for _, _, speaker in speakers:
+        if speaker in speakers_map:
+            speaker = speakers_map[speaker]
+        all_speakers_set.add(speaker)
 
     for yapping in transcript:
         start, end = yapping["offsets"].values()
@@ -59,8 +67,14 @@ if __name__ == '__main__':
                 else:
                     print(f"[{s_start} -> {s_end}] Unknown speaker {speaker}: {text}")
                 caster_yappage[speaker] += len(text.split())
+
+                time_points.append(start)
+                for _speaker in all_speakers_set:
+                    data_points[_speaker].append(caster_yappage[_speaker])
                 break
     # print(caster_yappage)
+
+    del caster_yappage["speaker_SPEAKER_00"]
 
     print("\n\n\n\n")
 
@@ -74,4 +88,11 @@ if __name__ == '__main__':
 
     table_data.sort(key=lambda x: x[2], reverse=True)
 
-    print(tabulate(table_data, ["caster", "words spoken", "z_yap"], tablefmt="rounded_outline"))
+    print(tabulate((list(zip(*list(zip(*table_data))[:2]))),
+                   ["caster", "words spoken", "z_yap"],
+                   tablefmt="rounded_outline"))
+    return time_points, data_points
+
+
+if __name__ == '__main__':
+    the_yap()
