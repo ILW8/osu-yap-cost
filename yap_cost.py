@@ -4,21 +4,23 @@ from collections import defaultdict
 from tabulate import tabulate
 
 
-def the_yap():
-    with open("data/2320297522_yap_transcript.json", "r") as infile:
+def the_yap(transcript_file: str, diarization_file: str):
+    with open(transcript_file, "r") as infile:
         transcription_output = json.load(infile)
     transcript = transcription_output["transcription"]
 
-    with open("data/2320297522_diarization_output.txt", "r") as infile:
+    with open(diarization_file, "r") as infile:
         diarization_output = infile.readlines()
     diarization_output = [line.strip().split() for line in diarization_output]
     speakers = [(float(start.split("=")[-1][:-1]), float(end.split("=")[-1][:-1]), speaker)
                 for start, end, speaker in diarization_output]
 
+    # TODO: the below logic sometimes mis-attributes speakers, as it doesn't check for total overlap ratio
+    #       but only checks the start timestamps of a speech segment.
     # I have a list of tuples in `speakers` indicating the start time, end time, and the speaker.
     # Eliminate overlaps by removing the overlapping speaker with the shortest duration.
 
-    # this code is ugly as heck tho...
+    # this code is ugly as heck
     for idx in range(len(speakers)):
         if speakers[idx] is None:
             continue
@@ -39,6 +41,7 @@ def the_yap():
 
     caster_yappage = defaultdict(int)
 
+    # todo: load speakers mapping from a data file
     speakers_map = {
         "speaker_SPEAKER_02": "ChillierPear",
         "speaker_SPEAKER_03": "D I O",
@@ -59,9 +62,7 @@ def the_yap():
     for yapping in transcript:
         start, end = yapping["offsets"].values()
         start = start / 1000.
-        end = end / 1000.
         text = yapping["text"]
-        # print(start, end)
 
         for s_start, s_end, speaker in speakers:
             if s_start <= start <= s_end and s_end - start > 0.5:
@@ -75,7 +76,6 @@ def the_yap():
                 for _speaker in all_speakers_set:
                     data_points[_speaker].append(caster_yappage[_speaker])
                 break
-    # print(caster_yappage)
 
     del caster_yappage["speaker_SPEAKER_00"]
 
@@ -88,7 +88,6 @@ def the_yap():
     for caster, words in caster_yappage.items():
         if words == 0:
             continue
-        # table_data.append([caster, words, round((words - avg_words) / stdev_words, 2)])
         table_data.append([caster, words, round((words - avg_words) / stdev_words, 2)])
 
     table_data.sort(key=lambda x: x[2], reverse=True)
@@ -97,7 +96,3 @@ def the_yap():
                    ["caster", "words spoken", "z_yap"],
                    tablefmt="simple_outline"))
     return time_points, data_points
-
-
-if __name__ == '__main__':
-    the_yap()

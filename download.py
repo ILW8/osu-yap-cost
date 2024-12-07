@@ -83,7 +83,7 @@ def download_from_playlist(uri: str, download_path_prefix="downloads", max_concu
                 download_file,
                 '/'.join(s.strip('/') for s in (base_uri, fragment_url)),
                 (local_path := os.path.join(intermediate_path, fragment_url.split("/")[-1]))):
-                    (local_path, fragment_url)
+                (local_path, fragment_url)
             for fragment_url in fragments
         }
 
@@ -117,3 +117,16 @@ def merge_parts(parts: [str], output: str, overwrite_output: bool = False, delet
     if delete:
         for part in parts:
             os.remove(part)
+
+
+def resample_audio(input_file: str, output_path: str, target_sample_rate: int) -> str:
+    """
+    Resamples audio and outputs as WAV pcm_s16le format
+    :param input_file:
+    :param output_path: path to output file
+    :param target_sample_rate: output sample rate
+    :return: ffmpeg run() return value
+    """
+    return ffmpeg.input(input_file).output(output_path,
+                                           acodec="pcm_s16le",
+                                           ar=target_sample_rate).run()
