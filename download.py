@@ -102,7 +102,7 @@ def download_from_playlist(uri: str, download_path_prefix="downloads", max_concu
     return intermediate_path, fragments
 
 
-def merge_parts(parts: [str], output: str, overwrite_output: bool = False) -> None:
+def merge_parts(parts: [str], output: str, overwrite_output: bool = False, delete: bool = False) -> None:
     if not overwrite_output and os.path.exists(output) and os.path.isfile(output):
         print(f"File {output} already exists, skipping merge.")
         return
@@ -111,8 +111,9 @@ def merge_parts(parts: [str], output: str, overwrite_output: bool = False) -> No
         for part in parts:
             f.write(f"file '{os.path.abspath(part)}'\n")
 
-        ffmpeg.input(f.name, format='concat', safe=0).output(output, c='copy').overwrite_output().run()
+        ffmpeg.input(f.name, format='concat', safe=0).output(output, c='pcm_s16le').overwrite_output().run()
 
     # delete all parts from disk
-    for part in parts:
-        os.remove(part)
+    if delete:
+        for part in parts:
+            os.remove(part)
