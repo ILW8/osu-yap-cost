@@ -1,4 +1,5 @@
 import os
+from pyannote.audio.pipelines.utils.hook import ProgressHook
 
 from pyannote.audio import Pipeline
 import torch
@@ -20,7 +21,8 @@ def diarize(filename: str):
     pipeline.to(torch.device("cuda"))
 
     # apply pretrained pipeline
-    diarization = pipeline(filename)
+    with ProgressHook() as hook:
+        diarization = pipeline(filename, hook=hook)
 
     # print the result
     for turn, _, speaker in diarization.itertracks(yield_label=True):
