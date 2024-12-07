@@ -1,4 +1,5 @@
 import json
+from statistics import stdev
 from collections import defaultdict
 from tabulate import tabulate
 
@@ -49,17 +50,28 @@ if __name__ == '__main__':
         start = start / 1000.
         end = end / 1000.
         text = yapping["text"]
-        print(start, end)
+        # print(start, end)
 
         for s_start, s_end, speaker in speakers:
             if s_start <= start <= s_end and s_end - start > 0.5:
                 if speaker in speakers_map:
                     speaker = speakers_map[speaker]
+                else:
+                    print(f"[{s_start} -> {s_end}] Unknown speaker {speaker}: {text}")
                 caster_yappage[speaker] += len(text.split())
                 break
     # print(caster_yappage)
 
     print("\n\n\n\n")
-    print(tabulate(caster_yappage.items(), ["caster", "words spoken"], tablefmt="simple_outline"))
-    from pprint import pprint
-    pprint(caster_yappage.items())
+
+    table_data = []
+
+    avg_words = sum(caster_yappage.values()) / len(caster_yappage)
+    stdev_words = stdev(caster_yappage.values())
+    for caster, words in caster_yappage.items():
+        # print(f"{caster}: {:.2f} z_yap")
+        table_data.append([caster, words, round((words - avg_words) / stdev_words, 2)])
+
+    table_data.sort(key=lambda x: x[2], reverse=True)
+
+    print(tabulate(table_data, ["caster", "words spoken", "z_yap"], tablefmt="rounded_outline"))
