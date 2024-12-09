@@ -7,7 +7,7 @@ from yap_cost import the_yap
 
 # VARIABLES TO EDIT:
 SRC_VOD_URL = "https://www.twitch.tv/videos/2320755972"  # twitch vod link
-DATA_LABEL = "showmatch_gf"  # prefix for files to be saved into data folder
+DATA_LABEL = "owc_gf"  # prefix for files to be saved into data folder
 
 
 def main():
@@ -34,5 +34,18 @@ def main():
     the_yap(transcript_path, diarization_data_path)
 
 
+def main_alt():
+    merged_audio_path = "data/owc_gf.wav"
+    merged_audio_resampled_path = "data/owc_gf_resampled.wav"
+    diarization_data_path = diarize(merged_audio_path, DATA_LABEL)
+
+    # todo: run whisper.cpp from here
+    # for now, hardcode a path to transcript
+    # resampled_audio_path = resample_audio(merged_audio_path, merged_audio_resampled_path, 16_000)
+    transcript_path = os.path.join("data", f"{DATA_LABEL}_yap_transcript.json")
+
+    the_yap(transcript_path, diarization_data_path)
+
+
 if __name__ == '__main__':
-    main()
+    main_alt()

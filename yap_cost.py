@@ -43,12 +43,17 @@ def the_yap(transcript_file: str, diarization_file: str):
 
     # todo: load speakers mapping from a data file
     speakers_map = {
-        "speaker_SPEAKER_02": "ChillierPear",
-        "speaker_SPEAKER_03": "D I O",
-        "speaker_SPEAKER_01": "Azer"
+        # "speaker_SPEAKER_02": "ChillierPear",
+        # "speaker_SPEAKER_03": "D I O",
+        # "speaker_SPEAKER_01": "Azer"
+
         # "speaker_SPEAKER_04": "Doomsdau",
         # "speaker_SPEAKER_03": "Damarsh",
         # "speaker_SPEAKER_01": "SadShiba"
+
+        "speaker_SPEAKER_00": "shiba",
+        "speaker_SPEAKER_03": "t1g",
+        "speaker_SPEAKER_02": "miles",
     }
 
     time_points = []
@@ -77,7 +82,6 @@ def the_yap(transcript_file: str, diarization_file: str):
                     data_points[_speaker].append(caster_yappage[_speaker])
                 break
 
-    del caster_yappage["speaker_SPEAKER_00"]
 
     print("\n\n\n\n")
 

@@ -5,15 +5,23 @@ import datetime
 
 
 if __name__ == '__main__':
-    xs, ys = the_yap()
+    xs, ys = the_yap("data/owc_gf_yap_transcript.json", "data/owc_gf_diarization.txt")
     print(xs)
     print(ys)
 
     xs = [datetime.datetime.fromtimestamp(x) for x in xs]
 
-    plt.plot(xs, ys["ChillierPear"])
-    plt.plot(xs, ys["Azer"])
-    plt.plot(xs, ys["D I O"])
+    n_count = 200000
+
+    xs = xs[:n_count]
+
+    # set plot to be 16 by 9
+    plt.figure(figsize=(16, 9))
+
+    names = ["t1g", "shiba", "miles"]
+
+    for name in names:
+        plt.plot(xs, ys[name])
 
     # add grid
     plt.grid()
@@ -29,6 +37,6 @@ if __name__ == '__main__':
     plt.gcf().autofmt_xdate()
 
     # add legend
-    plt.legend(["ChillierPear", "Azer", "D I O"])
+    plt.legend(names)
 
     plt.show()
